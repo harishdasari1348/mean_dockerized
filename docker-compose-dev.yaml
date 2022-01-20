@@ -1,0 +1,37 @@
+version: "3.8"
+services:
+  database:
+    image: mongo
+    container_name: mongo
+    environment:
+      - MONGO_DB=contacts
+    volumes:
+      - ./mongo:/home/mongodb
+      - ./mongo/init.db/:/docker-entrypoint-initdb.d/
+      - ./mongo/db:/data/db
+    ports:
+      - "27017:27017"
+  backend:
+    build:
+      context: ./backend
+      dockerfile: dockerfile.dev
+    container_name: backend
+    volumes:
+      - ./backend:/backend
+    ports:
+      - "4000:4000" #specify ports forewarding
+    environment:
+      - NODE_ENV=development
+    links:
+      - database
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: dockerfile.dev
+    container_name: frontend
+    volumes:
+      - ./frontend/:/frontend/
+    ports:
+      - "4200:4200"
+    environment:
+      - NODE_ENV=dev
